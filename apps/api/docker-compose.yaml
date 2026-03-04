@@ -9,7 +9,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
     ports:
-      - '${DB_PORT}:${DB_PORT}'
+      - '${DB_PORT}:5432'
     networks:
       - app-net
     healthcheck:
@@ -18,24 +18,27 @@ services:
       timeout: 5s
       retries: 0
 
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: cv-api-container
-    environment:
-      - '${PORT}:${PORT}'
-    depends_on:
-      - db
-    volumes:
-      - ./src:/app/src
-    networks:
-      - app-net
-    healthcheck:
-      test: ['CMD-SHELL', 'curl', '-f', 'http:localhost:3000/healthcheck']
-      interval: 10s
-      timeout: 5s
-      retries: 0
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: cv-api-container
+  #   env_file: '.env'
+  #   # environment:
+  #   #   - PORT=${PORT}
+  #   ports:
+  #     - '${PORT}:${PORT}'
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - ./src:/app/src
+  #   networks:
+  #     - app-net
+  #   healthcheck:
+  #     test: ['CMD-SHELL', 'curl', '-f', 'http:localhost:${PORT}/healthcheck']
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 0
 
   pgadmin:
     image: dpage/pgadmin4
@@ -46,6 +49,8 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
     ports:
       - '${PGADMIN_HOST_PORT}:${PGADMIN_CONTAINER_PORT}'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - db
     networks:
@@ -55,15 +60,29 @@ services:
     image: redis:latest
     container_name: redis-container
     ports:
-      - '${REDIS_PORT}:${REDIS_PORT}'
+      - '${REDIS_PORT}:6379'
     networks:
       - app-net
     restart: always
+    volumes:
+      - cache:/data
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping', '']
       interval: 10s
       timeout: 5s
       retries: 0
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    restart: always
+    networks:
+      - app-net
+    depends_on:
+      - redis
+    ports:
+      - '5540:5540'
+    volumes:
+      - redisinsight:/data
 
 networks:
   app-net:
@@ -71,3 +90,8 @@ networks:
 
 volumes:
   db:
+  pgadmin_data:
+  cache:
+    driver: local
+  redisinsight:
+    driver: local

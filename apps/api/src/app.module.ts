@@ -7,6 +7,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { PrismaService } from './prisma/prisma.service';
+import { AuthService } from './auth/auth.service';
+import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -14,10 +18,12 @@ import { PrismaService } from './prisma/prisma.service';
       isGlobal: true,
       envFilePath: ['.env'],
     }),
+    PassportModule.register({ session: true }),
     UserModule,
     PrismaModule,
+    AuthModule,
   ],
-  controllers: [AppController, UserController],
-  providers: [AppService, PrismaService, UserService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
