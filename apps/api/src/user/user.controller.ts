@@ -9,7 +9,6 @@ import {
   Post,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import {
   ApiBody,
   ApiOkResponse,
@@ -22,26 +21,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
-
-  @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiBody({
-    description: 'Payload for creating a user',
-    type: CreateUserDto,
-    examples: {
-      default: {
-        summary: 'Example User',
-        value: {
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          password: '',
-        },
-      },
-    },
-  })
-  async createUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createUser(createUserDto);
-  }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update user' })
@@ -80,5 +59,10 @@ export class UserController {
   @ApiOkResponse({ description: 'User has been found' })
   async findUserById(@Param('id') id: string) {
     return this.userService.findUser({ id });
+  }
+
+  @Get()
+  async() {
+    return 'test';
   }
 }
