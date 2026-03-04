@@ -5,7 +5,6 @@ import {
   HttpStatus,
   Post,
   Req,
-  Request,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -49,7 +48,8 @@ export class AuthController {
       default: {
         summary: 'Example User',
         value: {
-          name: 'John Doe',
+          firstName: 'John',
+          lastName: 'Doe',
           email: 'john.doe@example.com',
           password: '',
         },
