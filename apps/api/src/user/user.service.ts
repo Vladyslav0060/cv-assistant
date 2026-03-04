@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from 'generated/prisma/client';
+import { Prisma, User, Credential } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as argon2 from 'argon2';
@@ -45,6 +45,15 @@ export class UserService {
   ): Promise<User | null> {
     return this.prisma.user.findUniqueOrThrow({
       where: userWhereUniqueInput,
+    });
+  }
+
+  async findUserWithCredentials(
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+  ): Promise<(User & { credential: Credential | null }) | null> {
+    return this.prisma.user.findUniqueOrThrow({
+      where: userWhereUniqueInput,
+      include: { credential: true },
     });
   }
 
