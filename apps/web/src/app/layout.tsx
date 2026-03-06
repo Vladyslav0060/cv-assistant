@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
+import { Sidebar } from "@/components/layout/sidebar";
+import { TopNav } from "@/components/layout/top-nav";
 
-const nunitoSans = Nunito_Sans({variable:'--font-sans'});
+const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,10 +29,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={nunitoSans.variable}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body>
+        <div className="min-h-screen">
+          <TopNav />
+          <div className="mx-auto flex max-w-7xl gap-4 px-4 py-4">
+            <aside className="hidden w-64 shrink-0 md:block">
+              <Sidebar />
+            </aside>
+            <main className="min-w-0 flex-1 rounded-lg border bg-background p-4">
+              <Providers>{children}</Providers>;
+            </main>
+          </div>
+        </div>
       </body>
     </html>
   );

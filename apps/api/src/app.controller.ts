@@ -1,19 +1,31 @@
 import { Controller, Get, Req, Session, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthenticatedGuard } from './auth/guards/authenticated.guard';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { Roles } from './auth/decorators/roles.decorator';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { UserRole } from './user/dto/create-user.dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(@Session() session: any): string {
+  @ApiOkResponse({
+    schema: {
+      type: 'object',
+      properties: { message: { type: 'string' } },
+    },
+  })
+  getHello() {
     return this.appService.getHello();
   }
 
   @Get('me')
-  @UseGuards(AuthenticatedGuard)
+  @Roles(UserRole.USER)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   me(@Req() req: any, @Session() session: any) {
+    console.log(req.user);
     return { user: req.user, auth: req.isAuthenticated?.(), session };
   }
 }

@@ -23,7 +23,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Local Strategy Login' })
   @ApiBody({
     description: 'Payload for logging in',
-    type: CreateUserDto,
+    type: LoginDto,
     examples: {
       default: {
         summary: 'Example User',
