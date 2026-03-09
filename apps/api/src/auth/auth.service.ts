@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { User } from 'generated/prisma/client';
@@ -8,6 +9,8 @@ import { UserService } from 'src/user/user.service';
 import * as argon from 'argon2';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { Request, Response } from 'express';
+import { LogoutResponseDto } from './dto/logout-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -36,5 +39,26 @@ export class AuthService {
     }
 
     throw new NotFoundException("User doesn't exist");
+  }
+
+  async logout(req: Request, res: Response): Promise<LogoutResponseDto> {
+    return new Promise<LogoutResponseDto>((resolve, reject) => {
+      req.logout((err: any) => {
+        if (err) {
+          return reject(new InternalServerErrorException('Logout failed'));
+        }
+
+        req.session?.destroy((sessionErr: any) => {
+          if (sessionErr) {
+            return reject(
+              new InternalServerErrorException('Session destroy failed'),
+            );
+          }
+
+          res.clearCookie('sid');
+          resolve({ ok: true });
+        });
+      });
+    });
   }
 }

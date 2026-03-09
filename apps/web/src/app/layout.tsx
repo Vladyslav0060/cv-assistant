@@ -28,19 +28,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={nunitoSans.variable}>
+    <html lang="en" className={nunitoSans.variable} suppressHydrationWarning>
       <body>
-        <div className="min-h-screen">
-          <TopNav />
-          <div className="mx-auto flex max-w-7xl gap-4 px-4 py-4">
-            <aside className="hidden w-64 shrink-0 md:block">
-              <Sidebar />
-            </aside>
-            <main className="min-w-0 flex-1 rounded-lg border bg-background p-4">
-              <Providers>{children}</Providers>;
-            </main>
+        <Providers>
+          <div className="min-h-screen">
+            <TopNav />
+            <div className="mx-auto flex max-w-7xl gap-4 px-4 py-4">
+              <aside className="hidden w-64 shrink-0 md:block">
+                <Sidebar />
+              </aside>
+              <main className="min-w-0 flex-1 rounded-lg border bg-background p-4">
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
+        </Providers>
       </body>
     </html>
   );
