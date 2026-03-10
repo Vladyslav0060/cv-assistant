@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
-import { Sidebar } from "@/components/layout/sidebar";
 import { TopNav } from "@/components/layout/top-nav";
 
 const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
@@ -31,16 +30,15 @@ export default function RootLayout({
     <html lang="en" className={nunitoSans.variable} suppressHydrationWarning>
       <body>
         <Providers>
-          <div className="min-h-screen">
+          <div className="min-h-screen flex flex-col overflow-x-hidden">
             <TopNav />
-            <div className="mx-auto flex max-w-7xl gap-4 px-4 py-4">
-              <aside className="hidden w-64 shrink-0 md:block">
-                <Sidebar />
-              </aside>
-              <main className="min-w-0 flex-1 rounded-lg border bg-background p-4">
+            <main className="flex-1">
+              <div className="mx-auto max-w-7xl px-4 py-4">
+                {/* <div className="rounded-lg border bg-background p-4"> */}
                 {children}
-              </main>
-            </div>
+                {/* </div> */}
+              </div>
+            </main>
           </div>
         </Providers>
       </body>

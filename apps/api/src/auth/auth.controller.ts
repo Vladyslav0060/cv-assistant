@@ -89,6 +89,7 @@ export class AuthController {
   @Roles(UserRole.USER, UserRole.ADMIN)
   @UseGuards(AuthenticatedGuard, RolesGuard)
   me(@Req() req: any): MeDto {
+    console.log('req?.user: ', req?.user);
     if (!req.user) throw new UnauthorizedException();
     return toMeDto(req.user);
   }

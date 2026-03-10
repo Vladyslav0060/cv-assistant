@@ -41,7 +41,7 @@ export class UserService {
     });
   }
 
-  async getEnrichedUser(userId: string): Promise<EnrichedUser> {
+  async findEnrichedUser(userId: string): Promise<EnrichedUser> {
     return this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
       select: enrichedUserSelect,

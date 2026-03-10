@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from './create-user.dto';
+import { IsString } from 'class-validator';
 
 export class EnrichedUserDto {
   @ApiProperty()
@@ -8,56 +9,56 @@ export class EnrichedUserDto {
   @ApiProperty()
   email: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  firstName?: string | null;
+  @ApiProperty({ nullable: true })
+  firstName: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  lastName?: string | null;
+  @ApiProperty({ nullable: true })
+  lastName: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  avatarUrl?: string | null;
+  @ApiProperty({ nullable: true })
+  avatarUrl: string;
 
   @ApiProperty({ enum: UserRole, example: UserRole.USER })
-  role: string;
+  role: UserRole;
 
-  @ApiPropertyOptional({ nullable: true })
-  address?: string | null;
+  @ApiProperty({ nullable: true })
+  address: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  city?: string | null;
+  @ApiProperty({ nullable: true })
+  city: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  state?: string | null;
+  @ApiProperty({ nullable: true })
+  state: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  zip?: string | null;
+  @ApiProperty({ nullable: true })
+  zip: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  country?: string | null;
+  @ApiProperty({ nullable: true })
+  country: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  linkedIn?: string | null;
+  @ApiProperty({ nullable: true })
+  linkedIn: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  phone?: string | null;
+  @ApiProperty({ nullable: true })
+  phone: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  skills?: any;
+  @ApiProperty({ nullable: true })
+  skills: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  experience?: any;
+  @ApiProperty({ nullable: true })
+  experience: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  education?: any;
+  @ApiProperty({ nullable: true })
+  education: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  achievements?: any;
+  @ApiProperty({ nullable: true })
+  achievements: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  summary?: string | null;
+  @ApiProperty({ nullable: true })
+  summary: string;
 
-  @ApiPropertyOptional({ nullable: true })
-  portfolio?: string | null;
+  @ApiProperty({ nullable: true })
+  portfolio: string;
 
   @ApiProperty()
   createdAt: Date;

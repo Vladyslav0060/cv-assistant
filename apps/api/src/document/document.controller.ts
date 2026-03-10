@@ -29,7 +29,7 @@ export class DocumentController {
   ) {
     const { company, description, jobTitle, type } = body;
     const userId = session.passport.user;
-    const user = await this.userService.getEnrichedUser(userId);
+    const user = await this.userService.findEnrichedUser(userId);
     const applicantInfo = buildApplicantInfo(user);
 
     const systemPrompt = `You are an expert career coach. Write a professional ${

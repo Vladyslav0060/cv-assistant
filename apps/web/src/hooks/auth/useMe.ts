@@ -4,10 +4,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { authControllerMe } from "@/api/generated"; // или appControllerMe — как у тебя называется
 import { MeDto } from "@/api/generated.schemas";
+import { useCurrentUser } from "@/hooks/auth/current-user";
 
 export function useMe() {
+  const currentUser = useCurrentUser();
+
   return useQuery<(MeDto & { isAuthenticated: boolean }) | null>({
     queryKey: ["me"],
+    enabled: currentUser === undefined,
+    initialData:
+      currentUser === undefined
+        ? undefined
+        : currentUser
+          ? { ...currentUser, isAuthenticated: true }
+          : null,
+    staleTime: currentUser === undefined ? 0 : Infinity,
     queryFn: async () => {
       try {
         const { data } = await authControllerMe();
