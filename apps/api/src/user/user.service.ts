@@ -3,6 +3,7 @@ import { Prisma, User, Credential } from 'generated/prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as argon2 from 'argon2';
+import { EnrichedUser, enrichedUserSelect } from './user.select';
 
 @Injectable()
 export class UserService {
@@ -37,6 +38,13 @@ export class UserService {
       cursor,
       where,
       orderBy,
+    });
+  }
+
+  async getEnrichedUser(userId: string): Promise<EnrichedUser> {
+    return this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: enrichedUserSelect,
     });
   }
 
