@@ -20,8 +20,23 @@ enum AuthProvider {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  name      String?
   avatarUrl String?
+  firstName String?
+  lastName  String?
+  address   String?
+  city      String?
+  state     String?
+  zip       String?
+  country   String?
+  phone     String?
+  linkedIn  String?
+  portfolio String?
+  summary   String?
+  skills    String?
+  experience String?
+  education String?
+  achievements String?
+  documents Document[]
   role      String   @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -64,4 +79,20 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+enum DocumentType {
+  RESUME
+  COVER_LETTER
+}
+
+model Document {
+  id        String   @id @default(cuid())
+  title     String
+  type      DocumentType
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

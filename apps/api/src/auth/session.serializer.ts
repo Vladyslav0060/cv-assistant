@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportSerializer } from '@nestjs/passport';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { safeUserSelect } from 'src/user/user.select';
 
 @Injectable()
 export class SessionSerializer extends PassportSerializer {
@@ -13,7 +14,6 @@ export class SessionSerializer extends PassportSerializer {
     user: any,
     done: (err: Error | null, id?: string) => void,
   ): void {
-    // Store only a stable identifier in the session
     done(null, user.id);
   }
 
@@ -22,9 +22,11 @@ export class SessionSerializer extends PassportSerializer {
     done: (err: Error | null, user?: any) => void,
   ): Promise<void> {
     try {
-      const user = await this.prisma.user.findUnique({ where: { id } });
-      const obj = { ...user, test: 'hello' };
-      done(null, obj ?? undefined);
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+        select: safeUserSelect,
+      });
+      done(null, user ?? undefined);
     } catch (err) {
       done(err as Error);
     }

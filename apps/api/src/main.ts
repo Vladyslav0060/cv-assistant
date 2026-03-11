@@ -58,7 +58,7 @@ async function bootstrap() {
       rolling: true,
       cookie: {
         httpOnly: true,
-        sameSite: 'none',
+        sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       },
@@ -69,7 +69,8 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS?.split(/\s*,\s*/) ?? '*',
+    origin: ['http://localhost:3000'],
+    // origin: process.env.ALLOWED_ORIGINS?.split(/\s*,\s*/) ?? '*',
     credentials: true,
     exposedHeaders: ['Authorization'],
   });

@@ -1,20 +1,29 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Req,
-  Request,
   Res,
+  Session,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { CreateUserDto, UserRole } from 'src/user/dto/create-user.dto';
+import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { User } from 'generated/prisma/client';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { Request, Response } from 'express';
+import { LogoutResponseDto } from './dto/logout-response.dto';
+import { Roles } from './decorators/roles.decorator';
+import { AuthenticatedGuard } from './guards/authenticated.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { MeDto } from './dto/me.dto';
+import { toMeDto } from './mappers/me.mapper';
 
 @Controller('auth')
 export class AuthController {
@@ -24,7 +33,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Local Strategy Login' })
   @ApiBody({
     description: 'Payload for logging in',
-    type: CreateUserDto,
+    type: LoginDto,
     examples: {
       default: {
         summary: 'Example User',
@@ -49,7 +58,8 @@ export class AuthController {
       default: {
         summary: 'Example User',
         value: {
-          name: 'John Doe',
+          firstName: 'John',
+          lastName: 'Doe',
           email: 'john.doe@example.com',
           password: '',
         },
@@ -62,18 +72,25 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Req() req: any, @Res() res: any) {
-    req.logout((err: any) => {
-      if (err) return res.status(500).json({ message: 'Logout failed' });
+  @ApiOperation({ summary: 'Logout current user' })
+  @ApiOkResponse({
+    description: 'Logout successful',
+    type: LogoutResponseDto,
+  })
+  logout(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<LogoutResponseDto> {
+    return this.authService.logout(req, res);
+  }
 
-      req.session.destroy((err: any) => {
-        if (err)
-          return res.status(500).json({ message: 'Session destroy failed' });
-
-        res.clearCookie('sid'); // если ты указал name: 'sid'
-        // иначе: res.clearCookie('connect.sid')
-        return res.json({ ok: true });
-      });
-    });
+  @Get('me')
+  @ApiOkResponse({ type: MeDto })
+  @Roles(UserRole.USER, UserRole.ADMIN)
+  @UseGuards(AuthenticatedGuard, RolesGuard)
+  me(@Req() req: any): MeDto {
+    console.log('req?.user: ', req?.user);
+    if (!req.user) throw new UnauthorizedException();
+    return toMeDto(req.user);
   }
 }
