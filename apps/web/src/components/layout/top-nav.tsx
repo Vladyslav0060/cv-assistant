@@ -27,7 +27,6 @@ export function TopNav() {
 
         <div className="flex-1" />
 
-        <Separator orientation="vertical" className="h-6" />
         <ModeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -44,6 +43,16 @@ export function TopNav() {
                 <>
                   <DropdownMenuItem onClick={() => router.push(ROUTES.PROFILE)}>
                     Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push(ROUTES.DOCUMENTS)}
+                  >
+                    Documents
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => router.push(ROUTES.NEW_DOCUMENT)}
+                  >
+                    New Document
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleSignOut()}>
                     Sign out

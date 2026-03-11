@@ -15,9 +15,13 @@ export class CreateDocumentDto {
   @IsString()
   description: string;
 
-  @ApiProperty({ required: true })
+  @ApiProperty({
+    required: true,
+    enum: DocumentType,
+    enumName: 'DocumentType',
+  })
   @IsEnum(DocumentType)
-  type: 'RESUME' | 'COVER_LETTER';
+  type: DocumentType;
 
   @ApiProperty({ required: true })
   @IsString()

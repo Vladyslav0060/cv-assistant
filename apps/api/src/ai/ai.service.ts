@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import OpenAI from 'openai';
 
 type AskOptions = {
   system?: string;
@@ -10,36 +9,54 @@ type AskOptions = {
 
 @Injectable()
 export class AiService {
-  constructor(
-    private readonly client: OpenAI,
-    private readonly cfg: ConfigService,
-  ) {}
+  constructor(private readonly cfg: ConfigService) {}
   async ask(input: string, opts: AskOptions = {}) {
-    const small = this.cfg.get<string>('OPENAI_SMALL_MODEL') ?? 'gpt-5.2-mini';
-    const big = this.cfg.get<string>('OPENAI_DEFAULT_MODEL') ?? 'gpt-5.2';
+    const accountId = this.cfg.get<string>('CLOUDFLARE_ACCOUNT_ID');
+    const apiToken = this.cfg.get<string>('CLOUDFLARE_API_TOKEN');
 
-    const model = opts.highQuality ? big : small;
+    if (!accountId || !apiToken) {
+      throw new Error(
+        'Cloudflare Workers AI credentials are missing (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN)',
+      );
+    }
+    const model = '@cf/meta/llama-3.1-8b-instruct';
 
     const maxOutputTokens = opts.maxOutputTokens ?? 300; // ⭐ hard cap: biggest saver
 
-    const res = await this.client.responses.create({
-      model,
-      // “instructions” acts like your system prompt in Responses API
-      // instructions:
-      //   opts.system ?? 'Answer briefly. If unsure, ask one question.',
-      // input,
-      input: [
-        { role: 'system', content: opts.system || '' },
-        { role: 'user', content: input },
-      ],
-      // Depending on SDK/version this may be `max_output_tokens` or similar; if TS complains,
-      // keep the cap in your prompt and/or use the per-request options your SDK exposes.
-      max_output_tokens: maxOutputTokens as any,
-    });
+    const resp = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: 'system', content: opts.system || '' },
+            { role: 'user', content: input },
+          ],
+          max_tokens: maxOutputTokens,
+        }),
+      },
+    );
+
+    if (!resp.ok) {
+      const text = await resp.text().catch(() => '');
+      throw new Error(
+        `Cloudflare AI request failed: ${resp.status} ${resp.statusText} ${
+          text ? `- ${text}` : ''
+        }`,
+      );
+    }
+
+    const data: any = await resp.json();
+    const output = data?.result?.response ?? '';
 
     return {
-      text: res.output_text,
-      requestId: (res as any)._request_id,
+      text: output,
+      requestId: data?.result?.id ?? data?.result_id ?? undefined,
       model,
     };
   }

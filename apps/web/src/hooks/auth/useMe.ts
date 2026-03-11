@@ -2,7 +2,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { authControllerMe } from "@/api/generated"; // или appControllerMe — как у тебя называется
+import { authControllerMe } from "@/api/generated";
 import { MeDto } from "@/api/generated.schemas";
 import { useCurrentUser } from "@/hooks/auth/current-user";
 

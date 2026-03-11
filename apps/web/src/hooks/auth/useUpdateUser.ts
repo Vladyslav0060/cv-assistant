@@ -6,27 +6,26 @@ import { useRouter } from "next/navigation";
 export const useUpdateUser = () => {
   const router = useRouter();
   const qc = useQueryClient();
-  const { mutate, mutateAsync, isPending, isError, isSuccess, isLoading } =
-    useMutation({
-      mutationFn: async (data: UpdateUserDto) => {
-        const response = await userControllerUpdateUser(data);
-        return response.data;
-      },
-      onSuccess: (data) => {
-        console.log(data);
-        qc.invalidateQueries({ queryKey: ["me"] });
-        router.push("/");
-      },
-      onError: (error) => {
-        console.error(error);
-      },
-    });
+  const { mutate, mutateAsync, isPending, isError, isSuccess } = useMutation({
+    mutationFn: async (data: UpdateUserDto) => {
+      const response = await userControllerUpdateUser(data);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      qc.invalidateQueries({ queryKey: ["me"] });
+      router.push("/");
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
   return {
     mutate,
     mutateAsync,
     isPending,
     isError,
     isSuccess,
-    isLoading,
+    isLoading: isPending, //todo
   };
 };
