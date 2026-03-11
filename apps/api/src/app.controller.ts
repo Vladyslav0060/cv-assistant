@@ -20,12 +20,4 @@ export class AppController {
   getHello() {
     return this.appService.getHello();
   }
-
-  @Get('me')
-  @Roles(UserRole.USER)
-  @UseGuards(AuthenticatedGuard, RolesGuard)
-  me(@Req() req: any, @Session() session: any) {
-    console.log(req.user);
-    return { user: req.user, auth: req.isAuthenticated?.(), session };
-  }
 }

@@ -11,6 +11,11 @@ import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
+import { DocumentService } from './document/document.service';
+import { DocumentController } from './document/document.controller';
+import { DocumentModule } from './document/document.module';
+import { AiService } from './ai/ai.service';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -22,8 +27,10 @@ import { PassportModule } from '@nestjs/passport';
     UserModule,
     PrismaModule,
     AuthModule,
+    DocumentModule,
+    AiModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, DocumentController],
+  providers: [AppService, DocumentService],
 })
 export class AppModule {}

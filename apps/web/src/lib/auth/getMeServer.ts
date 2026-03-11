@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { getAuthControllerMeUrl } from "@/api/generated";
 
 export async function getMeServer() {
   const cookieStore = await cookies();
@@ -8,7 +9,7 @@ export async function getMeServer() {
     .map((c) => `${c.name}=${encodeURIComponent(c.value)}`)
     .join("; ");
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
+  const res = await fetch(getAuthControllerMeUrl(), {
     headers: { cookie: cookieHeader },
     cache: "no-store",
   });
@@ -16,5 +17,7 @@ export async function getMeServer() {
   if (res.status === 401 || res.status === 403) return null;
   if (!res.ok) throw new Error(`Auth check failed: ${res.status}`);
 
-  return res.json();
+  const data = await res.json();
+  console.log({ data }, { status: res.status });
+  return data;
 }
