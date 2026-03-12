@@ -1,10 +1,12 @@
-import { ProfileForm } from "./ProfileForm";
+import { Container } from "@/components/ui/container";
+import { ProfileForm } from "../../../components/feature/profile/ProfileForm";
 
 export default function Profile() {
   return (
-    <div className="flex flex-col size-full">
-      Profile
-      <ProfileForm />
-    </div>
+    <Container variant={"constrainedPadded"}>
+      <div className="mt-16">
+        <ProfileForm />
+      </div>
+    </Container>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
-import LoginForm from "./LoginForm";
+import { Container } from "@/components/ui/container";
+import LoginForm from "../../components/feature/auth/LoginForm";
 
 export default function LoginPage() {
   console.log(process.env.NEXT_PUBLIC_API_URL);
   return (
-    <div className="flex flex-col">
-      <p>LoginPage</p>
+    <Container className="flex flex-col justify-center max-w-sm">
       <LoginForm />
-    </div>
+    </Container>
   );
 }

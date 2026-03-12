@@ -30,16 +30,8 @@ export default function RootLayout({
     <html lang="en" className={nunitoSans.variable} suppressHydrationWarning>
       <body>
         <Providers>
-          <div className="min-h-screen flex flex-col overflow-x-hidden">
-            <TopNav />
-            <main className="flex-1">
-              <div className="mx-auto max-w-7xl px-4 py-4">
-                {/* <div className="rounded-lg border bg-background p-4"> */}
-                {children}
-                {/* </div> */}
-              </div>
-            </main>
-          </div>
+          <TopNav />
+          <main className="flex-1">{children}</main>
         </Providers>
       </body>
     </html>

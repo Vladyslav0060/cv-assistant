@@ -126,8 +126,6 @@ export const ProfileForm = () => {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
       <FieldGroup>
-        <FieldSeparator>Basic</FieldSeparator>
-
         <Controller
           control={form.control}
           name="email"
