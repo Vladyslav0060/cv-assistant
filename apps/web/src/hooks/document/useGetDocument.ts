@@ -6,7 +6,7 @@ import { documentControllerGetUserDocument } from "@/api/generated";
 
 export function useGetDocument(documentId: string) {
   return useQuery({
-    queryKey: ["documentId"],
+    queryKey: ["document", documentId],
     enabled: !!documentId,
     queryFn: async () => {
       try {
@@ -18,6 +18,6 @@ export function useGetDocument(documentId: string) {
         throw err; // real error
       }
     },
-    retry: false,
+    retry: true,
   });
 }

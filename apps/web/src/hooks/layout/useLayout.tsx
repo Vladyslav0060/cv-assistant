@@ -9,8 +9,7 @@ export const useBreadcrumbs = (next?: { title: string; href: string }[]) => {
   useEffect(() => {
     if (!next) return;
     setBreadcrumbs(next);
-    // We intentionally do not reset on unmount; next route/component should override
   }, [next, setBreadcrumbs]);
 
-  return [breadcrumbs, setBreadcrumbs] as const;
+  return [breadcrumbs?.items ?? [], setBreadcrumbs] as const;
 };

@@ -1,12 +1,24 @@
 "use client";
 
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
 import * as _ from "lodash";
+import { usePathname } from "next/navigation";
 
 export type Crumb = { title: string; href: string };
 
+type BreadcrumbState = {
+  pathname: string;
+  items: Crumb[];
+} | null;
+
 type BreadcrumbsContextValue = {
-  breadcrumbs: Crumb[];
+  breadcrumbs: BreadcrumbState;
   setBreadcrumbs: (next: Crumb[]) => void;
 };
 
@@ -19,13 +31,21 @@ export function BreadcrumbsProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [breadcrumbs, setBreadcrumbsState] = useState<Crumb[]>([]);
+  const pathname = usePathname();
+  const [breadcrumbs, setBreadcrumbsState] = useState<BreadcrumbState>(null);
 
-  const setBreadcrumbs = (next: Crumb[]) => {
-    setBreadcrumbsState((prev) => (_.isEqual(prev, next) ? prev : next));
-  };
+  const setBreadcrumbs = useCallback(
+    (next: Crumb[]) => {
+      setBreadcrumbsState((prev) =>
+        prev && prev.pathname === pathname && _.isEqual(prev.items, next)
+          ? prev
+          : { pathname, items: next },
+      );
+    },
+    [pathname],
+  );
 
-  const value = useMemo(() => ({ breadcrumbs, setBreadcrumbs }), [breadcrumbs]);
+  const value = useMemo(() => ({ breadcrumbs, setBreadcrumbs }), [breadcrumbs, setBreadcrumbs]);
 
   return (
     <BreadcrumbsContext.Provider value={value}>

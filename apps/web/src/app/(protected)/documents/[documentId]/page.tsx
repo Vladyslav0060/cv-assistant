@@ -1,12 +1,12 @@
 "use client";
 
-import {
-  ShadcnTemplate,
-  ShadcnTemplateRef,
-} from "@/components/editor/ShadcnTemplate";
+import { ShadcnEditor } from "@/components/editor";
+import { PageBreadcrumbs } from "@/components/layout/page-breadcrumbs";
+import { ROUTES } from "@/common/routes";
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetDocument } from "@/hooks/document/useGetDocument";
-import { use, useEffect, useRef } from "react";
+import { use } from "react";
+import { Container } from "@/components/ui/container";
 
 export const DocumentPage = ({
   params,
@@ -14,20 +14,38 @@ export const DocumentPage = ({
   params: Promise<{ documentId: string }>;
 }) => {
   const { documentId } = use(params);
-  const ref = useRef<ShadcnTemplateRef>(null);
   const { data: document } = useGetDocument(documentId);
-  useEffect(() => {
-    if (!document) return;
-    ref.current?.injectMarkdown(document.content);
-  }, [document]);
+  console.log({ document });
   return (
     <div className="flex flex-col">
-      <p>Document {document?.id}</p>
-      <Card>
-        <CardContent className="p-0">
-          <ShadcnTemplate ref={ref} />
-        </CardContent>
-      </Card>
+      <PageBreadcrumbs
+        items={[
+          { href: ROUTES.HOME, title: "Home" },
+          { href: ROUTES.DOCUMENTS, title: "Documents" },
+          {
+            href: `${ROUTES.DOCUMENTS}/${documentId}`,
+            title: document?.title ?? "Document",
+          },
+        ]}
+      />
+      <Container variant={"fullMobileConstrainedBreakpointPadded"}>
+        <Card>
+          <CardContent className="p-0">
+            {document?.content}
+            {/* {document === undefined ? (
+              <div className="min-h-[600px] p-4 text-sm text-muted-foreground">
+                Loading document...
+              </div>
+            ) : document ? (
+              <ShadcnEditor initialMarkdown={document.content} />
+            ) : (
+              <div className="min-h-[600px] p-4 text-sm text-muted-foreground">
+                Document could not be loaded.
+              </div>
+            )} */}
+          </CardContent>
+        </Card>
+      </Container>
     </div>
   );
 };
