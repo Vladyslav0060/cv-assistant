@@ -47,11 +47,6 @@ export const NewDocumentForm = () => {
     mode: "onSubmit",
   });
 
-  useBreadcrumbs([
-    { href: "/", title: "Home" },
-    { href: "#", title: "Home" },
-  ]);
-
   const onSubmit = async (values: NewDocumentFormValues) => {
     const res = await handleCreateDocument(values);
     console.log("res: ", res);
