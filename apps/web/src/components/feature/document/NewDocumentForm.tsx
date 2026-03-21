@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateDocument } from "@/hooks/document/useCreateDocument";
+import { useBreadcrumbs } from "@/hooks/layout/useLayout";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 
@@ -45,13 +46,19 @@ export const NewDocumentForm = () => {
     },
     mode: "onSubmit",
   });
+
+  useBreadcrumbs([
+    { href: "/", title: "Home" },
+    { href: "#", title: "Home" },
+  ]);
+
   const onSubmit = async (values: NewDocumentFormValues) => {
     const res = await handleCreateDocument(values);
     console.log("res: ", res);
   };
   return (
-    <div className="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
-      <Card className="w-full max-w-lg">
+    <div className="flex w-full min-w-0 flex-col gap-1 max-w-lg">
+      <Card className="w-full h-fit">
         <CardHeader>
           <CardTitle>User Information</CardTitle>
           <CardDescription>Please fill in your details below</CardDescription>

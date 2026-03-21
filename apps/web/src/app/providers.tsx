@@ -1,6 +1,7 @@
 "use client";
 
 import { ThemeProvider } from "@/components/theme-provider";
+import { BreadcrumbsProvider } from "@/lib/contexts/BreadCrumbContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -13,7 +14,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange
     >
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      <QueryClientProvider client={client}>
+        <BreadcrumbsProvider>{children}</BreadcrumbsProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

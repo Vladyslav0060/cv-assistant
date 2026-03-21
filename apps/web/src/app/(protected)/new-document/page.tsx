@@ -1,9 +1,12 @@
-import { NewDocumentForm } from "./NewDocumentForm";
+import { Container } from "@/components/ui/container";
+import { NewDocumentForm } from "../../../components/feature/document/NewDocumentForm";
 
 export default function Page() {
   return (
-    <div className="flex flex-col justify-center items-center">
-      <NewDocumentForm />
-    </div>
+    <Container variant="narrowConstrainedPadded">
+      <div className="flex size-full justify-center">
+        <NewDocumentForm />
+      </div>
+    </Container>
   );
 }

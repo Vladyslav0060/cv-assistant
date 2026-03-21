@@ -14,6 +14,7 @@ import { useSignOut } from "@/hooks/auth/useSignOut";
 import { useMe } from "@/hooks/auth/useMe";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/common/routes";
+import Link from "next/link";
 
 export function TopNav() {
   const router = useRouter();
@@ -21,9 +22,11 @@ export function TopNav() {
 
   const { mutate: handleSignOut } = useSignOut();
   return (
-    <header className="fixed w-full top-0 z-50 border-b bg-background/60 backdrop-blur">
+    <header className="relative w-full top-0 z-50 border-b bg-background/60 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
-        <div className="font-semibold">CV Assistant</div>
+        <Link href={ROUTES.HOME} className="font-semibold">
+          CV Assistant
+        </Link>
 
         <div className="flex-1" />
 

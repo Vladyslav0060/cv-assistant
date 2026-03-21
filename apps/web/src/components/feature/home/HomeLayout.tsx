@@ -3,7 +3,7 @@ import { ActionButton } from "./ActionButton";
 
 export const HomeLayout = () => {
   return (
-    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-background transition-colors">
+    <main className="relative flex h-full w-full items-center justify-center overflow-hidden bg-background transition-colors">
       <div className="absolute top-0 left-0 w-72 h-72 bg-indigo-400/30 dark:bg-indigo-500/30 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-300/20 dark:bg-emerald-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
       <div className="relative z-10 text-center px-6 space-y-6 max-w-2xl">

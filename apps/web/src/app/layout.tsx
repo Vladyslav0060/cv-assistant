@@ -27,11 +27,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={nunitoSans.variable} suppressHydrationWarning>
-      <body>
+    <html
+      lang="en"
+      className={`${nunitoSans.variable} ${geistSans.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body suppressHydrationWarning>
         <Providers>
-          <TopNav />
-          <main className="flex-1">{children}</main>
+          <main className="flex h-dvh flex-col overflow-hidden">
+            <TopNav />
+            <div className="min-h-0 flex-1 overflow-auto">{children}</div>
+          </main>
         </Providers>
       </body>
     </html>

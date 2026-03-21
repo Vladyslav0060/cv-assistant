@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { JSX, useEffect } from "react";
+import { useForm, Controller, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -30,6 +30,16 @@ import {
 import { UserControllerUpdateUserBody } from "@/api/models/user/user.zod";
 import { useEnrichedUser } from "@/hooks/user/useEnrichedUser";
 import { useCurrentUser } from "@/hooks/auth/current-user";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  AddressInfoInputs,
+  ContactInfoInputs,
+  CVInputs,
+  PersonalInfoInputs,
+  TabGroupProps,
+} from "./GroupedTabInputs";
+import { Typography } from "@/components/ui/typography";
 
 // const profileSchema = z.object({
 //   email: z.email("Invalid email").optional(),
@@ -53,6 +63,60 @@ import { useCurrentUser } from "@/hooks/auth/current-user";
 // });
 // type ProfileFormValues = z.infer<typeof profileSchema>;
 type ProfileFormValues = z.infer<typeof UserControllerUpdateUserBody>;
+
+const USER_TABS = {
+  PERSONAL_INFO: "Personal Info",
+  CONTACT: "Contact",
+  ADDRESS: "Address",
+  DETAILS: "Details",
+};
+
+type UserTabValue = (typeof USER_TABS)[keyof typeof USER_TABS];
+
+const TAB_GROUP_COMPONENTS: Record<
+  UserTabValue,
+  (props: TabGroupProps) => JSX.Element | null
+> = {
+  [USER_TABS.PERSONAL_INFO]: (props) => <PersonalInfoInputs {...props} />,
+  [USER_TABS.CONTACT]: (props) => <ContactInfoInputs {...props} />,
+  [USER_TABS.ADDRESS]: (props) => <AddressInfoInputs {...props} />,
+  [USER_TABS.DETAILS]: (props) => <CVInputs {...props} />,
+};
+
+const renderTabGroup = (tab: UserTabValue, props: TabGroupProps) =>
+  TAB_GROUP_COMPONENTS[tab]?.(props) ?? null;
+
+export const PERSONAL_NAME_FIELDS = [
+  {
+    name: "firstName",
+    label: "First name",
+    placeholder: "John",
+  },
+  {
+    name: "lastName",
+    label: "Last name",
+    placeholder: "Doe",
+  },
+] as const;
+
+const CONTACT_FIELDS = [
+  {
+    name: "linkedIn",
+    label: "LinkedIn",
+    placeholder: "https://linkedin.com/in/...",
+  },
+  {
+    name: "portfolio",
+    label: "Portfolio",
+    placeholder: "https://...",
+  },
+] as const;
+
+const ADDRESS_FIELDS = [
+  { name: "city", label: "City" },
+  { name: "state", label: "State" },
+  { name: "zip", label: "ZIP" },
+] as const;
 
 export const ProfileForm = () => {
   const me = useCurrentUser();
@@ -124,332 +188,53 @@ export const ProfileForm = () => {
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-      <FieldGroup>
-        <Controller
-          control={form.control}
-          name="email"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Email</FieldLabel>
-              <FieldContent>
-                <Input
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  disabled={isPending}
-                  {...field}
-                />
-                <FieldError
-                  errors={fieldState.error ? [fieldState.error] : []}
-                />
-              </FieldContent>
-            </Field>
+    <FormProvider {...form}>
+      <Typography element="h2" as={"h2"} className="mb-2">
+        Profile
+      </Typography>
+      <Tabs defaultValue={USER_TABS.PERSONAL_INFO} className="gap-4">
+        <TabsList>
+          {Object.values(USER_TABS).map((tabValue) => (
+            <TabsTrigger value={tabValue} key={tabValue}>
+              {tabValue}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {Object.values(USER_TABS).map((tabValue) => (
+            <TabsContent key={tabValue} value={tabValue}>
+              <Card>
+                <CardContent>
+                  <FieldGroup>
+                    {renderTabGroup(tabValue, { isPending })}
+                  </FieldGroup>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          ))}
+
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isPending || isLoading}
+              onClick={() => form.reset()}
+            >
+              Reset
+            </Button>
+            <Button type="submit" disabled={isPending || isLoading}>
+              {isPending ? "Saving..." : "Save"}
+            </Button>
+          </div>
+
+          {isError && (
+            <p className="text-destructive text-sm">
+              Failed to update profile. Please try again.
+            </p>
           )}
-        />
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <Controller
-            control={form.control}
-            name="firstName"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>First name</FieldLabel>
-                <FieldContent>
-                  <Input placeholder="John" disabled={isPending} {...field} />
-                  <FieldError
-                    errors={fieldState.error ? [fieldState.error] : []}
-                  />
-                </FieldContent>
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="lastName"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Last name</FieldLabel>
-                <FieldContent>
-                  <Input placeholder="Doe" disabled={isPending} {...field} />
-                  <FieldError
-                    errors={fieldState.error ? [fieldState.error] : []}
-                  />
-                </FieldContent>
-              </Field>
-            )}
-          />
-        </div>
-
-        <Controller
-          control={form.control}
-          name="avatarUrl"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Avatar URL</FieldLabel>
-              <FieldContent>
-                <Input
-                  placeholder="https://..."
-                  disabled={isPending}
-                  {...field}
-                />
-                <FieldDescription>Optional. Public image URL.</FieldDescription>
-                <FieldError
-                  errors={fieldState.error ? [fieldState.error] : []}
-                />
-              </FieldContent>
-            </Field>
-          )}
-        />
-
-        <Controller
-          control={form.control}
-          name="role"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Role</FieldLabel>
-              <FieldContent>
-                <Select
-                  value={field.value ?? ""}
-                  onValueChange={(v) =>
-                    field.onChange(v ? (v as UpdateUserDtoRole) : undefined)
-                  }
-                  disabled={isPending}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={UpdateUserDtoRole.user}>User</SelectItem>
-                    <SelectItem value={UpdateUserDtoRole.admin}>
-                      Admin
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <FieldDescription>
-                  If your backend ignores this for non-admins, it’s safe to
-                  leave.
-                </FieldDescription>
-                <FieldError
-                  errors={fieldState.error ? [fieldState.error] : []}
-                />
-              </FieldContent>
-            </Field>
-          )}
-        />
-      </FieldGroup>
-
-      <FieldGroup>
-        <FieldSeparator>Contact</FieldSeparator>
-
-        <Controller
-          control={form.control}
-          name="phone"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Phone</FieldLabel>
-              <FieldContent>
-                <Input
-                  placeholder="+1 555 000 0000"
-                  disabled={isPending}
-                  {...field}
-                />
-                <FieldError
-                  errors={fieldState.error ? [fieldState.error] : []}
-                />
-              </FieldContent>
-            </Field>
-          )}
-        />
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <Controller
-            control={form.control}
-            name="linkedIn"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>LinkedIn</FieldLabel>
-                <FieldContent>
-                  <Input
-                    placeholder="https://linkedin.com/in/..."
-                    disabled={isPending}
-                    {...field}
-                  />
-                  <FieldError
-                    errors={fieldState.error ? [fieldState.error] : []}
-                  />
-                </FieldContent>
-              </Field>
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="portfolio"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>Portfolio</FieldLabel>
-                <FieldContent>
-                  <Input
-                    placeholder="https://..."
-                    disabled={isPending}
-                    {...field}
-                  />
-                  <FieldError
-                    errors={fieldState.error ? [fieldState.error] : []}
-                  />
-                </FieldContent>
-              </Field>
-            )}
-          />
-        </div>
-      </FieldGroup>
-
-      <FieldGroup>
-        <FieldSeparator>Address</FieldSeparator>
-
-        <Controller
-          control={form.control}
-          name="address"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Address</FieldLabel>
-              <FieldContent>
-                <Input
-                  placeholder="Street address"
-                  disabled={isPending}
-                  {...field}
-                />
-                <FieldError
-                  errors={fieldState.error ? [fieldState.error] : []}
-                />
-              </FieldContent>
-            </Field>
-          )}
-        />
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <Controller
-            control={form.control}
-            name="city"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>City</FieldLabel>
-                <FieldContent>
-                  <Input disabled={isPending} {...field} />
-                  <FieldError
-                    errors={fieldState.error ? [fieldState.error] : []}
-                  />
-                </FieldContent>
-              </Field>
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="state"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>State</FieldLabel>
-                <FieldContent>
-                  <Input disabled={isPending} {...field} />
-                  <FieldError
-                    errors={fieldState.error ? [fieldState.error] : []}
-                  />
-                </FieldContent>
-              </Field>
-            )}
-          />
-          <Controller
-            control={form.control}
-            name="zip"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>ZIP</FieldLabel>
-                <FieldContent>
-                  <Input disabled={isPending} {...field} />
-                  <FieldError
-                    errors={fieldState.error ? [fieldState.error] : []}
-                  />
-                </FieldContent>
-              </Field>
-            )}
-          />
-        </div>
-
-        <Controller
-          control={form.control}
-          name="country"
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel>Country</FieldLabel>
-              <FieldContent>
-                <Input disabled={isPending} {...field} />
-                <FieldError
-                  errors={fieldState.error ? [fieldState.error] : []}
-                />
-              </FieldContent>
-            </Field>
-          )}
-        />
-      </FieldGroup>
-
-      <FieldGroup>
-        <FieldSeparator>CV</FieldSeparator>
-
-        {(
-          [
-            ["summary", "Summary", "A short professional summary"],
-            ["skills", "Skills", "Comma-separated or free text"],
-            ["experience", "Experience", "Your recent roles and impact"],
-            ["education", "Education", "Degrees, courses, certificates"],
-            ["achievements", "Achievements", "Awards, publications, etc."],
-          ] as const
-        ).map(([name, label, desc]) => (
-          <Controller
-            key={name}
-            control={form.control}
-            name={name}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel>{label}</FieldLabel>
-                <FieldContent>
-                  <Textarea
-                    placeholder={desc}
-                    disabled={isPending}
-                    rows={4}
-                    {...field}
-                  />
-                  <FieldDescription>{desc}</FieldDescription>
-                  <FieldError
-                    errors={fieldState.error ? [fieldState.error] : []}
-                  />
-                </FieldContent>
-              </Field>
-            )}
-          />
-        ))}
-      </FieldGroup>
-
-      <div className="flex items-center justify-end gap-3">
-        <Button
-          type="button"
-          variant="outline"
-          disabled={isPending || isLoading}
-          onClick={() => form.reset()}
-        >
-          Reset
-        </Button>
-        <Button type="submit" disabled={isPending || isLoading}>
-          {isPending ? "Saving..." : "Save"}
-        </Button>
-      </div>
-
-      {isError && (
-        <p className="text-destructive text-sm">
-          Failed to update profile. Please try again.
-        </p>
-      )}
-      {isSuccess && <p className="text-sm text-muted-foreground">Saved.</p>}
-    </form>
+          {isSuccess && <p className="text-sm text-muted-foreground">Saved.</p>}
+        </form>
+      </Tabs>
+    </FormProvider>
   );
 };
