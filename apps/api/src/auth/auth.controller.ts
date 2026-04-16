@@ -7,7 +7,6 @@ import {
   Post,
   Req,
   Res,
-  Session,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -24,6 +23,7 @@ import { AuthenticatedGuard } from './guards/authenticated.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { MeDto } from './dto/me.dto';
 import { toMeDto } from './mappers/me.mapper';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -69,6 +69,28 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   signUp(@Body() createUserDto: CreateUserDto): any {
     return this.authService.register(createUserDto);
+  }
+
+  @Get('google')
+  @ApiOperation({ summary: 'Google OAuth login' })
+  @UseGuards(GoogleAuthGuard)
+  googleAuth(): void {}
+
+  @Get('google/callback')
+  @ApiOperation({ summary: 'Google OAuth callback' })
+  @UseGuards(GoogleAuthGuard)
+  googleAuthCallback(
+    @Req() req: Request & { user?: any },
+    @Res({ passthrough: true }) res: Response,
+  ): MeDto | void {
+    if (!req.user) throw new UnauthorizedException();
+
+    const redirectUrl = process.env.AUTH_SUCCESS_REDIRECT_URL;
+    if (redirectUrl) {
+      res.redirect(redirectUrl);
+      return;
+    }
+    return toMeDto(req.user);
   }
 
   @Post('logout')

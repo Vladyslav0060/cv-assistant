@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import Providers from "./providers";
 import { TopNav } from "@/components/layout/top-nav";
@@ -34,18 +33,6 @@ export default function RootLayout({
       className={`${nunitoSans.variable} ${geistSans.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <head>
-        <Script id="strip-browser-injected-attrs" strategy="beforeInteractive">
-          {`
-            (function () {
-              var nodes = document.querySelectorAll('[bis_skin_checked]');
-              for (var i = 0; i < nodes.length; i++) {
-                nodes[i].removeAttribute('bis_skin_checked');
-              }
-            })();
-          `}
-        </Script>
-      </head>
       <body suppressHydrationWarning>
         <Providers>
           <main className="flex h-dvh flex-col overflow-hidden">
