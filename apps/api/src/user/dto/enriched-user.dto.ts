@@ -1,6 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from './create-user.dto';
-import { IsString } from 'class-validator';
 
 export class EnrichedUserDto {
   @ApiProperty()
@@ -65,4 +64,10 @@ export class EnrichedUserDto {
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty({
+    description: 'Percentage of non-empty profile fields',
+    example: 75,
+  })
+  profileFilledPercentage: number;
 }

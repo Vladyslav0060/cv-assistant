@@ -55,7 +55,7 @@ export const PersonalInfoInputs = ({ isPending }: TabGroupProps) => {
               <Input
                 placeholder="you@example.com"
                 autoComplete="email"
-                disabled={isPending}
+                disabled
                 {...field}
               />
               <FieldError errors={fieldState.error ? [fieldState.error] : []} />

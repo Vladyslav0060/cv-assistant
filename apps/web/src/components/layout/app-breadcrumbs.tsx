@@ -38,7 +38,12 @@ const STATIC_BREADCRUMBS: Record<string, Crumb[]> = {
   ],
 };
 
-const HIDDEN_PATHS = new Set([ROUTES.HOME, ROUTES.LOGIN, ROUTES.REGISTER, "/403"]);
+const HIDDEN_PATHS = new Set([
+  ROUTES.HOME,
+  ROUTES.LOGIN,
+  ROUTES.REGISTER,
+  "/403",
+]);
 
 function getFallbackBreadcrumbs(pathname: string) {
   if (HIDDEN_PATHS.has(pathname)) return [];
@@ -68,7 +73,7 @@ export function AppBreadcrumbs() {
   return (
     <div
       suppressHydrationWarning
-      className="border-b bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60"
+      className="bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60"
     >
       <div
         suppressHydrationWarning

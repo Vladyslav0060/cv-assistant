@@ -87,7 +87,9 @@ export class AuthController {
 
     const redirectUrl = process.env.AUTH_SUCCESS_REDIRECT_URL;
     if (redirectUrl) {
-      res.redirect(redirectUrl);
+      const url = new URL(redirectUrl);
+      url.searchParams.set('auth', 'google');
+      res.redirect(url.toString());
       return;
     }
     return toMeDto(req.user);

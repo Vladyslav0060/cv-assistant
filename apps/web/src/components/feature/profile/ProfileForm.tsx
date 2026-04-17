@@ -1,12 +1,11 @@
 "use client";
 
 import { JSX, useEffect } from "react";
-import { useForm, Controller, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { UpdateUserDto, UpdateUserDtoRole } from "@/api/generated.schemas";
-import { useMe } from "@/hooks/auth/useMe";
 import { useUpdateUser } from "@/hooks/auth/useUpdateUser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +31,8 @@ import { useEnrichedUser } from "@/hooks/user/useEnrichedUser";
 import { useCurrentUser } from "@/hooks/auth/current-user";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   AddressInfoInputs,
   ContactInfoInputs,
@@ -121,7 +122,6 @@ const ADDRESS_FIELDS = [
 export const ProfileForm = () => {
   const me = useCurrentUser();
   const { data: user } = useEnrichedUser(me?.id);
-  // const { data: me, isLoading } = useMe();
   const { mutateAsync, isPending, isError, isSuccess, isLoading } =
     useUpdateUser();
 
@@ -189,17 +189,53 @@ export const ProfileForm = () => {
 
   return (
     <FormProvider {...form}>
-      <Typography element="h2" as={"h2"} className="mb-2">
-        Profile
-      </Typography>
       <Tabs defaultValue={USER_TABS.PERSONAL_INFO} className="gap-4">
-        <TabsList>
+        <div className="flex items-center flex-col gap-4 rounded-2xl border bg-card/80 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Typography element="h3" as="h5">
+                Profile Completion
+              </Typography>
+              <Badge variant="secondary" className="rounded-full px-2.5 py-0.5">
+                {user?.profileFilledPercentage ?? 0}%
+              </Badge>
+            </div>
+            <Typography element="p" as="mutedText" className="max-w-lg">
+              Fill in the remaining details to make your CV profile stronger and
+              more complete.
+            </Typography>
+          </div>
+
+          <div className="w-full sm:max-w-xs">
+            <div className="h-2 overflow-hidden rounded-full bg-muted">
+              <div
+                className={cn(
+                  "h-full rounded-full bg-gradient-to-r from-emerald-400 via-lime-400 to-amber-300 transition-[width] duration-500 ease-out",
+                  (user?.profileFilledPercentage ?? 0) === 100 &&
+                    "from-emerald-500 via-emerald-400 to-emerald-300",
+                )}
+                style={{ width: `${user?.profileFilledPercentage ?? 0}%` }}
+              />
+            </div>
+            <div className="mt-2 flex justify-between text-xs text-muted-foreground">
+              <span>Incomplete</span>
+              <span>Complete</span>
+            </div>
+          </div>
+        </div>
+
+        <TabsList className="flex w-full flex-wrap justify-start gap-1 rounded-2xl bg-muted/70 p-1">
           {Object.values(USER_TABS).map((tabValue) => (
-            <TabsTrigger value={tabValue} key={tabValue}>
+            <TabsTrigger
+              value={tabValue}
+              key={tabValue}
+              className="rounded-xl px-3 py-2"
+            >
               {tabValue}
             </TabsTrigger>
           ))}
         </TabsList>
+
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {Object.values(USER_TABS).map((tabValue) => (
             <TabsContent key={tabValue} value={tabValue}>

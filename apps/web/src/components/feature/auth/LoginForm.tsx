@@ -40,7 +40,6 @@ export default function LoginForm({
 }: React.ComponentProps<"div">) {
   const { mutate: handleLogin } = useLogin();
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5050";
-  // Orval generates full URLs; keep only the path and prepend the runtime base URL.
   const googleAuthPath = getAuthControllerGoogleAuthUrl().replace(
     /^https?:\/\/[^/]+/,
     "",
