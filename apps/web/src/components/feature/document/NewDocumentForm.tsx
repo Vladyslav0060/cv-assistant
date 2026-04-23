@@ -26,7 +26,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCreateDocument } from "@/hooks/document/useCreateDocument";
-import { useBreadcrumbs } from "@/hooks/layout/useLayout";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 
@@ -48,6 +47,7 @@ export const NewDocumentForm = () => {
   });
 
   const onSubmit = async (values: NewDocumentFormValues) => {
+    console.log({ values });
     const res = await handleCreateDocument(values);
     console.log("res: ", res);
   };
@@ -128,7 +128,11 @@ export const NewDocumentForm = () => {
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>Type</FieldLabel>
                     <FieldContent>
-                      <Select defaultValue={DocumentType.COVER_LETTER}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={isPending}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>
