@@ -1,5 +1,8 @@
 "use client";
 
+import { Suspense, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CurrentUserProvider, useSetCurrentUser } from "@/hooks/auth/current-user";
@@ -7,8 +10,6 @@ import { useEnrichedUser } from "@/hooks/user/useEnrichedUser";
 import { useMe } from "@/hooks/auth/useMe";
 import { BreadcrumbsProvider } from "@/lib/contexts/BreadCrumbContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 function CurrentUserHydrator() {
@@ -64,7 +65,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <QueryClientProvider client={client}>
           <CurrentUserProvider value={undefined}>
             <CurrentUserHydrator />
-            <GoogleLoginToast />
+            <Suspense fallback={null}>
+              <GoogleLoginToast />
+            </Suspense>
             <BreadcrumbsProvider>{children}</BreadcrumbsProvider>
           </CurrentUserProvider>
         </QueryClientProvider>
