@@ -1,11 +1,13 @@
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5050";
+
 const config = {
   api: {
-    input: "http://localhost:5050/api-json",
+    input: `${apiUrl}/api-json`,
     output: {
       mode: "split",
       target: "src/api/generated.ts",
       client: "react-query",
-      baseUrl: "http://localhost:5050",
+      baseUrl: apiUrl,
       override: {
         mutator: {
           path: "src/api/mutator.ts",
@@ -19,7 +21,7 @@ const config = {
     },
   },
   apiZod: {
-    input: { target: "http://localhost:5050/api-json" },
+    input: { target: `${apiUrl}/api-json` },
     output: {
       client: "zod",
       mode: "tags-split",
