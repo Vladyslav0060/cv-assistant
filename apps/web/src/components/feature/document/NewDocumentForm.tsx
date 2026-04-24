@@ -45,13 +45,15 @@ export const NewDocumentForm = () => {
     },
     mode: "onSubmit",
   });
+
   const onSubmit = async (values: NewDocumentFormValues) => {
+    console.log({ values });
     const res = await handleCreateDocument(values);
     console.log("res: ", res);
   };
   return (
-    <div className="mx-auto flex w-full max-w-lg min-w-0 flex-col gap-1 self-stretch lg:max-w-none">
-      <Card className="w-full max-w-lg">
+    <div className="flex w-full min-w-0 flex-col gap-1 max-w-lg">
+      <Card className="w-full h-fit">
         <CardHeader>
           <CardTitle>User Information</CardTitle>
           <CardDescription>Please fill in your details below</CardDescription>
@@ -126,7 +128,11 @@ export const NewDocumentForm = () => {
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>Type</FieldLabel>
                     <FieldContent>
-                      <Select defaultValue={DocumentType.COVER_LETTER}>
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        disabled={isPending}
+                      >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select type" />
                         </SelectTrigger>

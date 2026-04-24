@@ -9,7 +9,7 @@ const items = [
 
 export function Sidebar() {
   return (
-    <nav className="h-[calc(100vh-56px-32px)] rounded-lg border bg-background p-3">
+    <nav className="h-full rounded-lg border bg-background p-3">
       <div className="px-2 py-2 text-sm font-medium text-muted-foreground">
         Navigation
       </div>

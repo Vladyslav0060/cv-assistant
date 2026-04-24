@@ -26,7 +26,7 @@ export class SessionSerializer extends PassportSerializer {
         where: { id },
         select: safeUserSelect,
       });
-      done(null, user ?? undefined);
+      done(null, user ?? false);
     } catch (err) {
       done(err as Error);
     }

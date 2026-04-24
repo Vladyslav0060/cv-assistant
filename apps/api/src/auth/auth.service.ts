@@ -3,18 +3,24 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { User } from 'generated/prisma/client';
+import { AuthProvider, User } from 'generated/prisma/client';
 import { UserService } from 'src/user/user.service';
 import * as argon from 'argon2';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { Request, Response } from 'express';
 import { LogoutResponseDto } from './dto/logout-response.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { safeUserSelect, SafeUser } from 'src/user/user.select';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private prisma: PrismaService,
+  ) {}
 
   async register(createUserDto: CreateUserDto): Promise<User> {
     const user = await this.userService.createUser(createUserDto);
@@ -58,6 +64,76 @@ export class AuthService {
           res.clearCookie('sid');
           resolve({ ok: true });
         });
+      });
+    });
+  }
+
+  async loginWithGoogle(profile: {
+    id: string;
+    emails?: Array<{ value: string }>;
+    name?: { givenName?: string; familyName?: string };
+    photos?: Array<{ value: string }>;
+  }): Promise<SafeUser> {
+    const email = profile.emails?.[0]?.value?.toLowerCase()?.trim();
+    if (!email) {
+      throw new UnauthorizedException(
+        'Google account does not provide an email',
+      );
+    }
+
+    const providerAccountId = profile.id;
+    const firstName = profile.name?.givenName?.trim() || null;
+    const lastName = profile.name?.familyName?.trim() || null;
+    const avatarUrl = profile.photos?.[0]?.value?.trim() || null;
+
+    return this.prisma.$transaction(async (tx) => {
+      const existingOAuth = await tx.oAuthAccount.findUnique({
+        where: {
+          provider_providerAccountId: {
+            provider: AuthProvider.google,
+            providerAccountId,
+          },
+        },
+        include: { user: { select: safeUserSelect } },
+      });
+
+      if (existingOAuth?.user) {
+        return existingOAuth.user;
+      }
+
+      const existingUser = await tx.user.findUnique({
+        where: { email },
+        select: safeUserSelect,
+      });
+
+      if (existingUser) {
+        await tx.oAuthAccount.create({
+          data: {
+            provider: AuthProvider.google,
+            providerAccountId,
+            email,
+            userId: existingUser.id,
+          },
+        });
+
+        return existingUser;
+      }
+
+      return tx.user.create({
+        data: {
+          email,
+          firstName,
+          lastName,
+          avatarUrl,
+          oauth: {
+            create: {
+              provider: AuthProvider.google,
+              providerAccountId,
+              email,
+            },
+          },
+        },
+        select: safeUserSelect,
       });
     });
   }

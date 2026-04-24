@@ -21,7 +21,7 @@ export class AiService {
     }
     const model = '@cf/meta/llama-3.1-8b-instruct';
 
-    const maxOutputTokens = opts.maxOutputTokens ?? 300; // ⭐ hard cap: biggest saver
+    const maxOutputTokens = opts.maxOutputTokens ?? 500; // ⭐ hard cap: biggest saver
 
     const resp = await fetch(
       `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`,

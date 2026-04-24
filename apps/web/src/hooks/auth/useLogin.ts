@@ -2,6 +2,7 @@ import { authControllerLogin } from "@/api/generated";
 import { LoginDto } from "@/api/generated.schemas";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const useLogin = () => {
   const router = useRouter();
@@ -11,9 +12,10 @@ export const useLogin = () => {
       const response = await authControllerLogin(data);
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log(data);
-      qc.invalidateQueries({ queryKey: ["me"] });
+      await qc.invalidateQueries({ queryKey: ["me"] });
+      toast("Logged in successfully");
       router.push("/");
     },
     onError: (error) => {

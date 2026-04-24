@@ -11,9 +11,10 @@ export const useSignOut = () => {
       const response = await authControllerLogout();
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log(data);
-      qc.invalidateQueries({ queryKey: ["me"] });
+      await qc.cancelQueries({ queryKey: ["me"] });
+      qc.setQueryData(["me"], null);
       router.push(ROUTES.LOGIN);
     },
     onError: (error) => {

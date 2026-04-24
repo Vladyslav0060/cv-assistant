@@ -1,5 +1,5 @@
-import { ComponentExample } from "@/components/component-example";
+import { HomeLayout } from "@/components/feature/home/HomeLayout";
 
 export default function Page() {
-return <ComponentExample />;
+  return <HomeLayout />;
 }

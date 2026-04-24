@@ -2,19 +2,12 @@ import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
-import { RedisStore } from 'connect-redis';
 import * as passport from 'passport';
-import { createClient } from 'redis';
 import { AppModule } from './app.module';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
+import { PostgresSessionStore } from './auth/postgres-session.store';
 
 const PORT = process.env.PORT ?? 5050;
-
-const REDIS_URL =
-  process.env.REDIS_URL ??
-  (process.env.REDIS_HOST && process.env.REDIS_PORT
-    ? `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
-    : undefined);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -31,29 +24,22 @@ async function bootstrap() {
   app.useGlobalFilters(new PrismaClientExceptionFilter(httpAdapter));
 
   app.use(cookieParser(process.env.APP_SECRET));
-
-  // Redis-backed sessions (recommended for both dev and prod)
-  if (!REDIS_URL) {
+  const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
+  if (!connectionString) {
     throw new Error(
-      'REDIS_URL is not set. Provide REDIS_URL or REDIS_HOST and REDIS_PORT.',
+      'DATABASE_URL or DIRECT_URL is not set. Provide one for the session store.',
     );
   }
 
-  const redisClient = createClient({ url: REDIS_URL });
-  redisClient.on('error', (err) => console.error('Redis Client Error', err));
-  await redisClient.connect();
-
-  const redisStore = new RedisStore({
-    client: redisClient,
-    prefix: 'cv:sess:',
-  });
+  const sessionStore = new PostgresSessionStore(connectionString);
+  await sessionStore.init();
 
   app.use(
     session({
       secret: process.env.APP_SECRET as string,
       resave: false,
       saveUninitialized: false,
-      store: redisStore,
+      store: sessionStore,
       name: 'sid',
       rolling: true,
       cookie: {
@@ -68,9 +54,13 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  const allowedOrigins =
+    process.env.ALLOWED_ORIGINS?.split(/\s*,\s*/).filter(Boolean) ?? [
+      'http://localhost:3000',
+    ];
+
   app.enableCors({
-    origin: ['http://localhost:3000'],
-    // origin: process.env.ALLOWED_ORIGINS?.split(/\s*,\s*/) ?? '*',
+    origin: allowedOrigins,
     credentials: true,
     exposedHeaders: ['Authorization'],
   });
