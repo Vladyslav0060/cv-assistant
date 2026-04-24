@@ -3,22 +3,39 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { authControllerMe } from "@/api/generated";
-import { MeDto } from "@/api/generated.schemas";
+import { EnrichedUserDto, MeDto } from "@/api/generated.schemas";
 import { useCurrentUser } from "@/hooks/auth/current-user";
+
+function toMeDto(
+  user: EnrichedUserDto | null | undefined,
+): MeDto | null | undefined {
+  if (!user) return user;
+
+  return {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    avatarUrl: user.avatarUrl,
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+}
 
 export function useMe() {
   const currentUser = useCurrentUser();
+  const initialMe = toMeDto(currentUser);
 
   return useQuery<(MeDto & { isAuthenticated: boolean }) | null>({
     queryKey: ["me"],
-    enabled: currentUser === undefined,
     initialData:
       currentUser === undefined
         ? undefined
-        : currentUser
-          ? { ...currentUser, isAuthenticated: true }
+        : initialMe
+          ? { ...initialMe, isAuthenticated: true }
           : null,
-    staleTime: currentUser === undefined ? 0 : Infinity,
+    staleTime: 0,
     queryFn: async () => {
       try {
         const { data } = await authControllerMe();
