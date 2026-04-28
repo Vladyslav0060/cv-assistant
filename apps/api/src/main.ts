@@ -54,13 +54,8 @@ async function bootstrap() {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  const allowedOrigins =
-    process.env.ALLOWED_ORIGINS?.split(/\s*,\s*/).filter(Boolean) ?? [
-      'http://localhost:3000',
-    ];
-
   app.enableCors({
-    origin: allowedOrigins,
+    origin: [process.env.AUTH_SUCCESS_REDIRECT_URL],
     credentials: true,
     exposedHeaders: ['Authorization'],
   });
