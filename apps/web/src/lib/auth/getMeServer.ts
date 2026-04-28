@@ -11,6 +11,7 @@ export async function getMeServer() {
 
   const res = await fetch(getAuthControllerMeUrl(), {
     headers: { cookie: cookieHeader },
+    credentials: "include",
     cache: "no-store",
   });
 
