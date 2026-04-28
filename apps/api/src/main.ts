@@ -11,6 +11,10 @@ const PORT = process.env.PORT ?? 5050;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const authRedirectUrl = process.env.AUTH_SUCCESS_REDIRECT_URL;
+  const frontendOrigin = authRedirectUrl
+    ? new URL(authRedirectUrl).origin
+    : undefined;
 
   const config = new DocumentBuilder()
     .setTitle('CV Assistant')
@@ -44,7 +48,7 @@ async function bootstrap() {
       rolling: true,
       cookie: {
         httpOnly: true,
-        sameSite: 'lax',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       },
@@ -55,7 +59,7 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.enableCors({
-    origin: [process.env.AUTH_SUCCESS_REDIRECT_URL],
+    origin: frontendOrigin ? [frontendOrigin] : false,
     credentials: true,
     exposedHeaders: ['Authorization'],
   });
