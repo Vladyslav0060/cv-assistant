@@ -11,6 +11,7 @@ const PORT = process.env.PORT ?? 5050;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.getHttpAdapter().getInstance().set('trust proxy', 1);
   const authRedirectUrl = process.env.AUTH_SUCCESS_REDIRECT_URL;
   const frontendOrigin = authRedirectUrl
     ? new URL(authRedirectUrl).origin
@@ -48,10 +49,11 @@ async function bootstrap() {
       store: sessionStore,
       name: 'sid',
       rolling: true,
+      proxy: true,
       cookie: {
         httpOnly: true,
         sameSite: isCrossSiteDeployment ? 'none' : 'lax',
-        secure: isCrossSiteDeployment,
+        secure: isCrossSiteDeployment ? 'auto' : false,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       },
     }),
