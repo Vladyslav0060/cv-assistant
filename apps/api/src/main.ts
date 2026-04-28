@@ -15,6 +15,8 @@ async function bootstrap() {
   const frontendOrigin = authRedirectUrl
     ? new URL(authRedirectUrl).origin
     : undefined;
+  const isCrossSiteDeployment =
+    !!frontendOrigin && !frontendOrigin.includes('localhost');
 
   const config = new DocumentBuilder()
     .setTitle('CV Assistant')
@@ -48,8 +50,8 @@ async function bootstrap() {
       rolling: true,
       cookie: {
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production',
+        sameSite: isCrossSiteDeployment ? 'none' : 'lax',
+        secure: isCrossSiteDeployment,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       },
     }),
