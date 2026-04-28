@@ -1,13 +1,11 @@
-import { redirect } from "next/navigation";
-import { getMeServer } from "@/lib/auth/getMeServer";
+"use client";
 
-export default async function ProtectedLayout({
+import { AuthGate } from "@/components/feature/auth/AuthGate";
+
+export default function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const me = await getMeServer();
-  if (!me) redirect("/login");
-
-  return children;
+  return <AuthGate>{children}</AuthGate>;
 }

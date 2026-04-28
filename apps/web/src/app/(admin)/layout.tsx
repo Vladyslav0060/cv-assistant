@@ -1,14 +1,11 @@
-import { redirect } from "next/navigation";
-import { getMeServer } from "@/lib/auth/getMeServer";
+"use client";
 
-export default async function AdminLayout({
+import { AuthGate } from "@/components/feature/auth/AuthGate";
+
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  console.log("admin layout log");
-  const me = await getMeServer();
-  if (!me) redirect("/login");
-  if (me.role !== "admin") redirect("/403"); // или "/"
-  return <>{children}</>;
+  return <AuthGate adminOnly>{children}</AuthGate>;
 }
